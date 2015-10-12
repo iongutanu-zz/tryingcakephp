@@ -41,11 +41,10 @@ class QuestionsController extends AppController
     public function passquiz($q_id = null, $id = null )
     {
         # debug($this->request->data);
-        $actual_question = $this->request->params['pass'][1];
         # debug($this->request->params);
         if ($this->request->is('post')) 
             { 
-                $quest = $this->get_question($q_id, $actual_question-1)->first();
+                $quest = $this->get_question($q_id, $id-1)->first();
                 if (($this->request->data['answer'] == 'A') && ($quest->correct_answer == false))
                 {
                     $quest->total_correct_answers+=1;
@@ -65,10 +64,11 @@ class QuestionsController extends AppController
                 unset($this->request->data['answer']);
             }
         if (!$q_id) {
-            //$this->cakeError('error404');
-            debug('Quiz not found');
+            $this->Flash->error(__('The quize not found.'));
+            return $this->redirect(['action' => 'index']);
+            #debug('Quiz not found');
         }
-        $question = $this->get_question($q_id, $actual_question)->first();
+        $question = $this->get_question($q_id, $id)->first();
         #debug($question);
         if (!$question) {
             unset($this->request->data['answer']);
@@ -77,7 +77,7 @@ class QuestionsController extends AppController
         }
         $this->set(compact('question'));
         $this->set('toalQuestions', $this->count_questions($q_id));
-        $this->set('questionNumber', $actual_question);
+        $this->set('questionNumber', $id);
     }
 
     public function index()
